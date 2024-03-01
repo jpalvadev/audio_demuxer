@@ -1,4 +1,3 @@
-import shlex
 from threading import Thread
 import shutil
 import os
@@ -9,6 +8,7 @@ from PIL import Image
 import constants
 import custom_widgets
 import utils
+from state import state
 
 
 # Set FFMPEG temporal ENV PATH
@@ -18,21 +18,6 @@ os.environ["PATH"] += os.pathsep + utils.resource("ffmpeg")
 # App Configuration
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme(utils.resource("themes/theme.json"))
-
-
-global_vars = {
-    "source": "",
-    "output": "",
-    "model": "Hybrid Transformer Demucs v4",
-    "output_format": "MP3",
-    "mp3_bitrate": "320",
-    "split_mode": "Separate all tracks",
-    "device": "GPU (CUDA)" if constants.CUDA_VERSION >= constants.MIN_CUDA_VERSION else "CPU",
-    "shifts": 1,
-    "clip_mode": "Rescale",
-    "jobs": 1,
-    "overlap": 0.25,
-}
 
 
 app = customtkinter.CTk()
@@ -62,26 +47,15 @@ def change_appearance_mode():
 def separate_worker():
     # pylint: disable=broad-except
     try:
-        demucs.separate.main(shlex.split(
-            f'{constants.OUTPUT_FORMATS[global_vars["output_format"]]} '
-            f'{"--mp3-bitrate " + global_vars["mp3_bitrate"] if global_vars["output_format"] == "MP3" else ""} '
-            f'{constants.SPLIT_MODES[global_vars["split_mode"]]} '
-            f'-n {constants.MODELS[global_vars["model"]]} '
-            f'--shifts {global_vars["shifts"]} '
-            f'--clip-mode {constants.CLIP_MODES[global_vars["clip_mode"]]} '
-            f'--overlap {global_vars["overlap"]} '
-            f'-d {constants.DEVICES[global_vars["device"]]} '
-            f'-o "{global_vars["output"]}" '
-            f'-j {global_vars["jobs"]} '
-            f'"{global_vars["source"]}"'))
+        demucs.separate.main(state.get_separate_settings())
 
         # Removing temp files
         file_folder_name = os.path.splitext(
-            os.path.basename(global_vars["source"]))[0]
-        model_folder_name = constants.MODELS[global_vars["model"]]
+            os.path.basename(state.get("source")))[0]
+        model_folder_name = constants.MODELS[state.get("model")]
         shutil.copytree(
-            f"{global_vars['output']}/{model_folder_name}/{file_folder_name}", global_vars["output"], dirs_exist_ok=True)
-        shutil.rmtree(f"{global_vars['output']}/{model_folder_name}", True)
+            f"{state.get('output')}/{model_folder_name}/{file_folder_name}", state.get('output'), dirs_exist_ok=True)
+        shutil.rmtree(f"{state.get('output')}/{model_folder_name}", True)
         utils.show_notification(master=app, title="Success",
                                 message="Audio separated successfully.",
                                 icon="check")
@@ -98,21 +72,7 @@ def separate_worker():
 
 
 def separate():
-    settings = f'''
-    Selected Audio File: {global_vars["source"]}
-    Files will be saved in: {global_vars["output"]}
-    Selected Model: {global_vars["model"]}
-    Split Mode: {global_vars["split_mode"]}
-    Output Format: {global_vars["output_format"]} 
-    Shifts set to: {global_vars["shifts"]}
-    Overlap set to: {global_vars["overlap"]}
-    Clip Mode: {global_vars["clip_mode"]}
-    Selected Device for Separation: {global_vars["device"]} 
-    '''
-
-    loading_frame.show(settings)
-    utils.progress_tracker.set_shifts(int(global_vars["shifts"]))
-
+    loading_frame.show(state.get_separate_text())
     t = Thread(target=separate_worker)
     t.start()
 
@@ -124,8 +84,8 @@ def set_source():
     )
     if not source:
         return
-    global_vars["source"] = source
-    source_selected_label.set_text(global_vars["source"])
+    state.set("source", source)
+    source_selected_label.set_text(state.get("source"))
     check_paths()
 
 
@@ -134,8 +94,8 @@ def set_output():
         title="Select output directory")
     if not output:
         return
-    global_vars["output"] = output
-    output_selected_label.set_text(global_vars["output"])
+    state.set("output", output)
+    output_selected_label.set_text(state.get("output"))
     check_paths()
 
 
@@ -160,26 +120,26 @@ def hide_jobs_spinbox():
 
 
 def check_paths():
-    if not global_vars["source"] or not global_vars["output"]:
+    if not state.get("source") or not state.get("output"):
         separate_btn.configure(**constants.DISABLED_BTN_STYLE)
     else:
         separate_btn.configure(**constants.DEFAULT_BTN_STYLE)
 
 
 def update_gui():
-    if global_vars["output_format"] == "MP3":
+    if state.get("output_format") == "MP3":
         show_bitrate_menu()
     else:
         hide_bitrate_menu()
 
-    if global_vars["device"] == "CPU":
+    if state.get("device") == "CPU":
         show_jobs_spinbox()
     else:
         hide_jobs_spinbox()
 
 
-def update_global_vars(choice, key):
-    global_vars[key] = choice
+def update_state(choice, key):
+    state.set(key, choice)
     update_gui()
 
 
@@ -234,7 +194,7 @@ model_title_label.grid(row=6, column=1, columnspan=2, sticky="w")
 model_menu = customtkinter.CTkOptionMenu(
     app,
     values=list(constants.MODELS.keys()),
-    command=lambda choice: update_global_vars(choice, "model")
+    command=lambda choice: update_state(choice, "model")
 )
 model_menu.grid(row=6, column=3, columnspan=5, sticky="ew")
 
@@ -245,7 +205,7 @@ split_mode_title_label.grid(row=7, column=1, columnspan=2, sticky="w")
 split_mode_menu = customtkinter.CTkOptionMenu(
     app,
     values=list(constants.SPLIT_MODES.keys()),
-    command=lambda choice: update_global_vars(choice, "split_mode"),
+    command=lambda choice: update_state(choice, "split_mode"),
 )
 split_mode_menu.grid(row=7, column=3, columnspan=3, sticky="ew")
 
@@ -256,7 +216,7 @@ format_title_label.grid(row=8, column=1, columnspan=2, sticky="w")
 format_menu = customtkinter.CTkOptionMenu(
     app,
     values=list(constants.OUTPUT_FORMATS.keys()),
-    command=lambda choice: update_global_vars(choice, "output_format"),
+    command=lambda choice: update_state(choice, "output_format"),
 )
 format_menu.grid(row=8, column=3, columnspan=2, sticky="ew")
 
@@ -267,7 +227,7 @@ mp3_bitrate_title_label.grid(row=8, column=5, columnspan=2, sticky="ew")
 mp3_bitrate_menu = customtkinter.CTkOptionMenu(
     app,
     values=constants.MP3_BITRATES,
-    command=lambda choice: update_global_vars(choice, "mp3_bitrate"),
+    command=lambda choice: update_state(choice, "mp3_bitrate"),
 )
 mp3_bitrate_menu.grid(row=8, column=7, columnspan=1, sticky="ew")
 
@@ -278,7 +238,7 @@ clip_title_label.grid(row=9, column=1, columnspan=2, sticky="w")
 clip_menu = customtkinter.CTkOptionMenu(
     app,
     values=list(constants.CLIP_MODES.keys()),
-    command=lambda choice: update_global_vars(choice, "clip_mode"),
+    command=lambda choice: update_state(choice, "clip_mode"),
 )
 clip_menu.grid(row=9, column=3, columnspan=2, sticky="ew")
 
@@ -289,7 +249,7 @@ device_title_label.grid(row=6, column=10, columnspan=1, sticky="w")
 device_menu = customtkinter.CTkOptionMenu(
     app,
     values=list(constants.DEVICES.keys()),
-    command=lambda choice: update_global_vars(choice, "device"),
+    command=lambda choice: update_state(choice, "device"),
 )
 device_cpuonly_label = custom_widgets.Label(app, text="CPU")
 if constants.CUDA_VERSION >= constants.MIN_CUDA_VERSION:
@@ -303,11 +263,10 @@ overlap_title_label = customtkinter.CTkLabel(
     app, text="Overlap", justify="left")
 overlap_title_label.grid(row=7, column=10, columnspan=1, sticky="w")
 overlap_spinbox = custom_widgets.Spinbox(app,
-                                         command=update_global_vars,
+                                         command=update_state,
                                          step_size=constants.OVERLAP_STEP_SIZE,
                                          min_value=constants.OVERLAP_MIN_VALUE,
                                          max_value=constants.OVERLAP_MAX_VALUE,
-                                         initial_value=global_vars["overlap"],
                                          key="overlap"
                                          )
 overlap_spinbox.grid(row=7, column=11, columnspan=2, sticky="ew")
@@ -317,11 +276,10 @@ shifts_title_label = customtkinter.CTkLabel(
     app, text="Shifts", justify="left")
 shifts_title_label.grid(row=8, column=10, columnspan=1, sticky="w")
 shifts_spinbox = custom_widgets.Spinbox(app,
-                                        command=update_global_vars,
+                                        command=update_state,
                                         step_size=constants.SHIFTS_STEP_SIZE,
                                         min_value=constants.SHIFTS_MIN_VALUE,
                                         max_value=constants.SHIFTS_MAX_VALUE,
-                                        initial_value=global_vars["shifts"],
                                         key="shifts"
                                         )
 shifts_spinbox.grid(row=8, column=11, columnspan=2, sticky="ew")
@@ -330,11 +288,10 @@ shifts_spinbox.grid(row=8, column=11, columnspan=2, sticky="ew")
 jobs_title_label = customtkinter.CTkLabel(
     app, text="Jobs", justify="left")
 jobs_spinbox = custom_widgets.Spinbox(app,
-                                      command=update_global_vars,
+                                      command=update_state,
                                       step_size=constants.JOBS_STEP_SIZE,
                                       min_value=constants.JOBS_MIN_VALUE,
                                       max_value=constants.JOBS_MAX_VALUE,
-                                      initial_value=global_vars["jobs"],
                                       key="jobs"
                                       )
 
@@ -345,7 +302,7 @@ separate_btn.grid(row=10, column=11, columnspan=2,
                   rowspan=2, sticky="ew", pady=(10, 0))
 
 
-DEBUG = False
+DEBUG = True
 if DEBUG:
     def show_no():
         utils.show_notification(
@@ -362,12 +319,12 @@ if DEBUG:
             icon="check")
 
     def separatin():
-        global_vars["source"] = "C:/tmp/bas.ta_fuerte.mp3"
-        global_vars["output"] = "C:/tmp"
+        state.source = "C:/tmp/bas.ta_fuerte.mp3"
+        state.output = "C:/tmp"
         separate()
 
     def print_state():
-        print(global_vars)
+        print(state.__dict__)
 
     no_btn = customtkinter.CTkButton(master=app, text="No", command=show_no)
     no_btn.grid(row=10, column=7, columnspan=2,

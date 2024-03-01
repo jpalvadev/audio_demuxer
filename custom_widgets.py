@@ -3,13 +3,13 @@ import math
 import customtkinter
 import constants
 import utils
+from state import state
 
 
 class Spinbox(customtkinter.CTkFrame):
     def __init__(self, *args,
                  step_size: Union[int, float] = 1,
                  command: Callable = None,
-                 initial_value: Union[int, float] = 1,
                  min_value: Union[int, float] = 1,
                  max_value: Union[int, float] = 10,
                  key: str = None,
@@ -18,10 +18,10 @@ class Spinbox(customtkinter.CTkFrame):
 
         self.step_size = step_size
         self.command = command
-        self.initial_value = initial_value
         self.min_value = min_value
         self.max_value = max_value
         self.key = key
+        self.value = state.get(key)
 
         self.grid_columnconfigure((0, 2), weight=0)
         self.grid_columnconfigure(1, weight=1)
@@ -30,8 +30,8 @@ class Spinbox(customtkinter.CTkFrame):
                                                        command=self.subtract_button_callback)
         self.subtract_button.grid(row=0, column=0, padx=(0, 0), pady=0)
 
-        self.label_var = customtkinter.IntVar(value=self.initial_value) if isinstance(
-            step_size, int) else customtkinter.DoubleVar(value=self.initial_value)
+        self.label_var = customtkinter.IntVar(value=self.value) if isinstance(
+            step_size, int) else customtkinter.DoubleVar(value=self.value)
         self.label = customtkinter.CTkLabel(
             self, width=60, textvariable=self.label_var)
         self.label.grid(row=0, column=1, columnspan=1,
