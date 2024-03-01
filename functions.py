@@ -62,6 +62,3 @@
 # def update_global_vars(choice, key):
 #     global_vars[key] = choice
 #     update_gui()
-
-def set_progress_bar(position, value):
-    pass

@@ -111,6 +111,7 @@ def separate():
     '''
 
     loading_frame.show(settings)
+    utils.progress_tracker.set_shifts(int(global_vars["shifts"]))
 
     t = Thread(target=separate_worker)
     t.start()

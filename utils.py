@@ -29,6 +29,7 @@ class ProgressTracker:
         self.current_count = 0
         self.progress = 0
         self.total_steps = 0
+        self.shifts = 1
 
     def get_progress(self):
         return self.progress
@@ -37,7 +38,8 @@ class ProgressTracker:
         self.bags_count = bags_count
 
     def set_progress(self):
-        p = (self.current_count / self.bags_count) / self.total_steps
+        p = (self.current_count / (self.bags_count * self.shifts)) / \
+            self.total_steps
         self.progress = round(p, 2)
 
     def increment_current_count(self):
@@ -46,6 +48,9 @@ class ProgressTracker:
 
     def set_total_steps(self, total_steps):
         self.total_steps = total_steps
+
+    def set_shifts(self, shifts):
+        self.shifts = shifts
 
     def reset_current_count(self):
         self.current_count = 0
