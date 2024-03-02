@@ -21,7 +21,7 @@ customtkinter.set_default_color_theme(utils.resource("themes/theme.json"))
 
 
 app = customtkinter.CTk()
-app.title("Audio Demuxer")
+app.title("Demuxify")
 app.geometry(f"{constants.WINDOW_WIDTH}x{constants.WINDOW_HEIGHT}")
 app.resizable(False, False)
 
@@ -144,9 +144,15 @@ def update_state(choice, key):
 
 
 # Title and subtitle
-app_title_label = customtkinter.CTkLabel(
-    app, text="Audio Demuxer", font=("Roboto", 36), justify="center")
-app_title_label.grid(row=0, column=1, columnspan=12, sticky="ew")
+logo_img = customtkinter.CTkImage(light_image=Image.open(utils.resource("images/app_light.png")),
+                                  dark_image=Image.open(
+    utils.resource("images/app_dark.png")),
+    size=(50, 60))
+
+logo_label = customtkinter.CTkLabel(
+    app, image=logo_img, text=" " * 21 + "emuxify", font=("Roboto", 32))
+logo_label.grid(row=0, column=0, columnspan=12, sticky="ew")
+
 
 app_subtitle_label = customtkinter.CTkLabel(
     app, text="Made with ❤ by: @jpalvadev, using Demucs from Meta, Inc.", font=("Roboto", 16), justify="center")
@@ -302,7 +308,7 @@ separate_btn.grid(row=10, column=11, columnspan=2,
                   rowspan=2, sticky="ew", pady=(10, 0))
 
 
-DEBUG = True
+DEBUG = False
 if DEBUG:
     def show_no():
         utils.show_notification(
