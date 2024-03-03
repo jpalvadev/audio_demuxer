@@ -84,7 +84,8 @@ class LoadingFrame(customtkinter.CTkFrame):
 
         self.configure(fg_color=("#FFFFFF", "#0C0A09"))
 
-        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure((0, 1, 2), weight=1)
+        # self.grid_columnconfigure(1, weight=12)
         self.grid_rowconfigure((0, 1, 2, 3), weight=1)
 
         self.settings_label = customtkinter.CTkLabel(self, justify="left")
@@ -112,11 +113,16 @@ class LoadingFrame(customtkinter.CTkFrame):
                                                 )
 
         self.progressbar = customtkinter.CTkProgressBar(
-            self, height=18, width=constants.WINDOW_WIDTH / 2)
-        self.progressbar.grid(row=2, column=0)
+            self, height=20, width=constants.WINDOW_WIDTH / 2.5)
+        self.progressbar.configure(
+            fg_color=["#f8fafc", "#0C0A09"], border_width=1, border_color=["#4338ca", "#f2dd78"])
+        self.progressbar.grid(row=2, column=1, sticky="s")
+        self.progressbar_label = customtkinter.CTkLabel(
+            self, text=self.progressbar.get(), justify="right", font=("Roboto", 18))
+        self.progressbar_label.place(relx=0.5, rely=0.74, anchor="center")
 
         self.label = customtkinter.CTkLabel(
-            self, text="Audio Demuxer is working. Please wait...", font=("Roboto", 24))
+            self, text="Demuxify is working. Please wait...", font=("Roboto", 24))
         self.label.grid(row=3, column=0, columnspan=3, sticky="ew")
 
     def show(self, text: str):
@@ -156,6 +162,8 @@ class LoadingFrame(customtkinter.CTkFrame):
             math.sin(self.angle + 4),
             anchor="center")
         self.progressbar.set(utils.progress_tracker.get_progress())
+        self.progressbar_label.configure(
+            text=str(int(utils.progress_tracker.get_progress() * 100)) + "%")
 
         # To avoid after_cancel bug, after gets called only when animation_id is not None
         self.animation_id = self.after(

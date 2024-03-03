@@ -332,6 +332,9 @@ if DEBUG:
     def print_state():
         print(state.__dict__)
 
+    def show_loading_frame():
+        loading_frame.show(state.get_separate_text())
+
     no_btn = customtkinter.CTkButton(master=app, text="No", command=show_no)
     no_btn.grid(row=10, column=7, columnspan=2,
                 rowspan=2, sticky="ew", pady=(10, 0))
@@ -346,6 +349,11 @@ if DEBUG:
         master=app, text="Sparate", command=separatin)
     separate_debug_btn.grid(row=10, column=3, columnspan=2,
                             rowspan=2, sticky="ew", pady=(10, 0))
+
+    show_loading_frame_btn = customtkinter.CTkButton(
+        master=app, text="Loading Frame", command=show_loading_frame)
+    show_loading_frame_btn.grid(row=10, column=1, columnspan=2,
+                                rowspan=2, sticky="ew", pady=(10, 0))
 
     bags_label = customtkinter.CTkLabel(
         app, text="Bags", justify="left")
