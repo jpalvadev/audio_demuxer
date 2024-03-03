@@ -5,6 +5,7 @@ import demucs.separate
 import customtkinter
 from customtkinter import filedialog
 from PIL import Image
+from CTkToolTip import CTkToolTip
 import constants
 import custom_widgets
 import utils
@@ -164,9 +165,11 @@ theme_icons = customtkinter.CTkImage(light_image=Image.open(utils.resource("imag
                                          utils.resource("images/dark.png")),
                                      size=(20, 20))
 
-togle_theme_btn = customtkinter.CTkButton(
+toggle_theme_btn = customtkinter.CTkButton(
     app, image=theme_icons, text="", width=28, height=28, command=change_appearance_mode)
-togle_theme_btn.grid(row=0, column=12, sticky="e")
+toggle_theme_btn.grid(row=0, column=12, sticky="e")
+CTkToolTip(toggle_theme_btn, message=constants.TOOLTIPS["toggle_theme"],
+           **constants.TOOLTIP_SETTINGS)
 
 
 # Source Selection Section
@@ -180,6 +183,10 @@ source_selected_label.grid(
 source_btn = customtkinter.CTkButton(
     app, text="Select", command=set_source)
 source_btn.grid(row=3, column=12)
+CTkToolTip(source_title_label, message=constants.TOOLTIPS["source"],
+           **constants.TOOLTIP_SETTINGS)
+CTkToolTip(source_btn, message=constants.TOOLTIPS["source"],
+           **constants.TOOLTIP_SETTINGS)
 
 # Output Selection Section
 output_title_label = customtkinter.CTkLabel(
@@ -192,6 +199,10 @@ output_selected_label.grid(
 output_btn = customtkinter.CTkButton(
     app, text="Select", command=set_output)
 output_btn.grid(row=4, column=12)
+CTkToolTip(output_title_label, message=constants.TOOLTIPS["output"],
+           **constants.TOOLTIP_SETTINGS)
+CTkToolTip(output_btn, message=constants.TOOLTIPS["output"],
+           **constants.TOOLTIP_SETTINGS)
 
 # Model Selection Section
 model_title_label = customtkinter.CTkLabel(
@@ -203,6 +214,11 @@ model_menu = customtkinter.CTkOptionMenu(
     command=lambda choice: update_state(choice, "model")
 )
 model_menu.grid(row=6, column=3, columnspan=5, sticky="ew")
+CTkToolTip(model_title_label, message=constants.TOOLTIPS["model"],
+           **constants.TOOLTIP_SETTINGS)
+CTkToolTip(model_menu, message=constants.TOOLTIPS["model"],
+           **constants.TOOLTIP_SETTINGS)
+
 
 # Split Mode Selection Section
 split_mode_title_label = customtkinter.CTkLabel(
@@ -214,6 +230,10 @@ split_mode_menu = customtkinter.CTkOptionMenu(
     command=lambda choice: update_state(choice, "split_mode"),
 )
 split_mode_menu.grid(row=7, column=3, columnspan=3, sticky="ew")
+CTkToolTip(split_mode_title_label, message=constants.TOOLTIPS["split_mode"],
+           **constants.TOOLTIP_SETTINGS)
+CTkToolTip(split_mode_menu, message=constants.TOOLTIPS["split_mode"],
+           **constants.TOOLTIP_SETTINGS)
 
 # Format Selection Section
 format_title_label = customtkinter.CTkLabel(
@@ -225,6 +245,10 @@ format_menu = customtkinter.CTkOptionMenu(
     command=lambda choice: update_state(choice, "output_format"),
 )
 format_menu.grid(row=8, column=3, columnspan=2, sticky="ew")
+CTkToolTip(format_title_label, message=constants.TOOLTIPS["format"],
+           **constants.TOOLTIP_SETTINGS)
+CTkToolTip(format_menu, message=constants.TOOLTIPS["format"],
+           **constants.TOOLTIP_SETTINGS)
 
 # Mp3 bitrate Selection Section
 mp3_bitrate_title_label = customtkinter.CTkLabel(
@@ -236,6 +260,10 @@ mp3_bitrate_menu = customtkinter.CTkOptionMenu(
     command=lambda choice: update_state(choice, "mp3_bitrate"),
 )
 mp3_bitrate_menu.grid(row=8, column=7, columnspan=1, sticky="ew")
+CTkToolTip(mp3_bitrate_title_label, message=constants.TOOLTIPS["mp3_bitrate"],
+           **constants.TOOLTIP_SETTINGS)
+CTkToolTip(mp3_bitrate_menu, message=constants.TOOLTIPS["mp3_bitrate"],
+           **constants.TOOLTIP_SETTINGS)
 
 # Clip Mode Selection Section
 clip_title_label = customtkinter.CTkLabel(
@@ -247,6 +275,10 @@ clip_menu = customtkinter.CTkOptionMenu(
     command=lambda choice: update_state(choice, "clip_mode"),
 )
 clip_menu.grid(row=9, column=3, columnspan=2, sticky="ew")
+CTkToolTip(clip_title_label, message=constants.TOOLTIPS["clip"],
+           **constants.TOOLTIP_SETTINGS)
+CTkToolTip(clip_menu, message=constants.TOOLTIPS["clip"],
+           **constants.TOOLTIP_SETTINGS)
 
 # Device Selection Section
 device_title_label = customtkinter.CTkLabel(
@@ -257,12 +289,19 @@ device_menu = customtkinter.CTkOptionMenu(
     values=list(constants.DEVICES.keys()),
     command=lambda choice: update_state(choice, "device"),
 )
+CTkToolTip(device_title_label, message=constants.TOOLTIPS["device"],
+           **constants.TOOLTIP_SETTINGS)
+CTkToolTip(device_menu, message=constants.TOOLTIPS["device"],
+           **constants.TOOLTIP_SETTINGS)
 device_cpuonly_label = custom_widgets.Label(app, text="CPU")
 if constants.CUDA_VERSION >= constants.MIN_CUDA_VERSION:
     device_menu.grid(row=6, column=11, columnspan=2, sticky="ew")
 else:
     device_cpuonly_label.grid(
         row=6, column=11, columnspan=2, padx=0, sticky="ew")
+CTkToolTip(device_cpuonly_label, message=constants.TOOLTIPS["device"],
+           **constants.TOOLTIP_SETTINGS)
+
 
 # Overlap Selection Section
 overlap_title_label = customtkinter.CTkLabel(
@@ -276,6 +315,8 @@ overlap_spinbox = custom_widgets.Spinbox(app,
                                          key="overlap"
                                          )
 overlap_spinbox.grid(row=7, column=11, columnspan=2, sticky="ew")
+CTkToolTip(overlap_title_label, message=constants.TOOLTIPS["overlap"],
+           **constants.TOOLTIP_SETTINGS)
 
 # Shifts Selection Section
 shifts_title_label = customtkinter.CTkLabel(
@@ -289,6 +330,8 @@ shifts_spinbox = custom_widgets.Spinbox(app,
                                         key="shifts"
                                         )
 shifts_spinbox.grid(row=8, column=11, columnspan=2, sticky="ew")
+CTkToolTip(shifts_title_label, message=constants.TOOLTIPS["shifts"],
+           **constants.TOOLTIP_SETTINGS)
 
 # Jobs Selection Section
 jobs_title_label = customtkinter.CTkLabel(
@@ -300,12 +343,16 @@ jobs_spinbox = custom_widgets.Spinbox(app,
                                       max_value=constants.JOBS_MAX_VALUE,
                                       key="jobs"
                                       )
+CTkToolTip(jobs_title_label, message=constants.TOOLTIPS["jobs"],
+           **constants.TOOLTIP_SETTINGS)
 
 # Run demucs btn
 separate_btn = customtkinter.CTkButton(
     master=app, text="Separate", command=separate, **constants.DISABLED_BTN_STYLE)
 separate_btn.grid(row=10, column=11, columnspan=2,
                   rowspan=2, sticky="ew", pady=(10, 0))
+CTkToolTip(separate_btn, message=constants.TOOLTIPS["separate"],
+           **constants.TOOLTIP_SETTINGS)
 
 
 DEBUG = False
@@ -364,4 +411,6 @@ if DEBUG:
 loading_frame = custom_widgets.LoadingFrame(app)
 
 update_gui()
+
+
 app.mainloop()

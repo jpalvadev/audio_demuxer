@@ -1,4 +1,5 @@
 import torch
+
 # pylint: disable=broad-except
 try:
     CUDA_VERSION = torch.cuda.get_device_properties(0).major
@@ -21,6 +22,16 @@ JOBS_MAX_VALUE = 20
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
 
+TOOLTIP_SETTINGS = {
+    "delay": 0.6,
+    "corner_radius": 3,
+    "alpha": 0.85,
+    "bg_color": ["#0C0A09", "#f8fafc"],
+    "text_color": ["#f8fafc", "#0C0A09"],
+    "x_offset": -100,
+    "y_offset": 30,
+}
+
 DISABLED_BTN_STYLE = {
     "fg_color": ["#e5e5e5", "#292524"],
     "border_color": ["#e5e5e5", "#292524"],
@@ -35,6 +46,23 @@ DEFAULT_BTN_STYLE = {
     "state": "normal"
 }
 
+TOOLTIPS = {
+    "toggle_theme": "Switch between light mode and dark mode.",
+    "source": "Select an audio file to separate.",
+    "output": "Folder where to put extracted tracks.",
+    "model": "Select a Demucs model for audio source separation.",
+    "split_mode": "Select how to separate audio source.",
+    "format": "Select the output format.",
+    "mp3_bitrate": "Select the bitrate for the MP3 output.",
+    "clip": "Strategy for avoiding clipping: rescaling entire signal if necessary (rescale) or hard clipping (clamp).",
+    "device": "Device to use for audio separation.",
+    "overlap": "Overlap between the splits.",
+    "shifts": "Number of random shifts for equivariant stabilization. Increase separation time but improves quality",
+    "jobs": "Number of jobs. Increase when RAM and multiple cores are available.",
+    "separate": "Start the separation process.",
+
+}
+
 MODELS = {
     "Hybrid Transformer Demucs v4": "htdemucs",
     "Hybrid Transformer Demucs v4 Fine-Tuned": "htdemucs_ft",
@@ -45,6 +73,7 @@ MODELS = {
     "MDX quantized": "mdx_q",
     "MDX + extra sources quantized": "mdx_extra_q"
 }
+
 
 FILETYPES = [
     ("MP3 Files", "*.mp3"),

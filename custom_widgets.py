@@ -85,7 +85,6 @@ class LoadingFrame(customtkinter.CTkFrame):
         self.configure(fg_color=("#FFFFFF", "#0C0A09"))
 
         self.grid_columnconfigure((0, 1, 2), weight=1)
-        # self.grid_columnconfigure(1, weight=12)
         self.grid_rowconfigure((0, 1, 2, 3), weight=1)
 
         self.settings_label = customtkinter.CTkLabel(self, justify="left")
