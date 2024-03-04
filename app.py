@@ -22,7 +22,7 @@ customtkinter.set_default_color_theme(utils.resource("themes/theme.json"))
 
 
 app = customtkinter.CTk()
-app.title("Demuxify")
+app.title("Demuxify v1.0")
 app.geometry(f"{constants.WINDOW_WIDTH}x{constants.WINDOW_HEIGHT}")
 app.resizable(False, False)
 
