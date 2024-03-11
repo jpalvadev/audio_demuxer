@@ -43,6 +43,7 @@ def check_checksum(path: Path, checksum: str):
 class ModelOnlyRepo:
     """Base class for all model only repos.
     """
+
     def has_model(self, sig: str) -> bool:
         raise NotImplementedError()
 
@@ -61,9 +62,10 @@ class RemoteRepo(ModelOnlyRepo):
         try:
             url = self._models[sig]
         except KeyError:
-            raise ModelLoadingError(f'Could not find a pre-trained model with signature {sig}.')
+            raise ModelLoadingError(
+                f'Could not find a pre-trained model with signature {sig}.')
         pkg = torch.hub.load_state_dict_from_url(
-            url, map_location='cpu', check_hash=True)  # type: ignore
+            url, map_location='cpu', check_hash=True, progress=False)  # type: ignore
         return load_model(pkg)
 
 
@@ -95,7 +97,8 @@ class LocalRepo(ModelOnlyRepo):
         try:
             file = self._models[sig]
         except KeyError:
-            raise ModelLoadingError(f'Could not find pre-trained model with signature {sig}.')
+            raise ModelLoadingError(
+                f'Could not find pre-trained model with signature {sig}.')
         if sig in self._checksums:
             check_checksum(file, self._checksums[sig])
         return load_model(file)
@@ -105,6 +108,7 @@ class BagOnlyRepo:
     """Handles only YAML files containing bag of models, leaving the actual
     model loading to some Repo.
     """
+
     def __init__(self, root: Path, model_repo: ModelOnlyRepo):
         self.root = root
         self.model_repo = model_repo
